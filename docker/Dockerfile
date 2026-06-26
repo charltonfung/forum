@@ -1,17 +1,22 @@
 # ============================================================
 # Laravel forum 開發用 image
 # ============================================================
-# 基底：PHP 8.1 CLI（不用 fpm + nginx，直接用 artisan serve 就好，學習階段足夠）
+# 基底：PHP 8.0 CLI
+#
+# 為何不用更新的 PHP 8.1+？
+#   composer.json 鎖定 "php": "^7.3|^8.0"，且 composer.lock 是 2021 年生成的，
+#   含 phpunit 9.5.4 / phpspec/prophecy 1.13.0 等不支援 PHP 8.1 的測試套件。
+#   要升 PHP 必須先升 composer.lock 並重測，這專案保持原貌只用 8.0。
 #
 # 包含：
-#   - PHP 8.1 + Laravel 需要的 extension（pdo_mysql, mbstring, zip, gd 等）
+#   - PHP 8.0 + Laravel 需要的 extension（pdo_mysql, mbstring, zip, gd 等）
 #   - Composer
 #   - Node.js 18 + npm（前端資源編譯用）
 #
 # 不在這層做 composer install / npm install — 因為 source code 是 volume mount，
 # build 時做了也會被蓋掉。改成「容器起來後再執行一次」。
 # ============================================================
-FROM php:8.1-cli
+FROM php:8.0-cli
 
 # 系統相依（git 給 composer 用、libzip / libpng / libonig 給 PHP ext 用）
 RUN apt-get update && apt-get install -y --no-install-recommends \

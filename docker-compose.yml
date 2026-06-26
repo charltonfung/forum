@@ -1,0 +1,97 @@
+# ============================================================
+# Laravel forum 開發環境（Docker Compose）
+# ============================================================
+# 一指令啟動整套：php / mysql / mailhog
+#
+#   docker compose up -d        # 啟動（背景）
+#   docker compose down         # 停止 + 移除 container（資料還在）
+#   docker compose down -v      # 連 volume 也砍（會清掉 DB 資料！）
+#   docker compose logs -f app  # 看 app log
+#   docker compose exec app bash  # 進到 app container 內
+#
+# 三個 service 的對應：
+#   - http://localhost:8000   → Laravel app
+#   - http://localhost:8025   → Mailpit Web UI（看開發信件）
+#   - localhost:3306          → MySQL（host 端要用 GUI 工具連時）
+#
+# Docker 內部 service 之間用 service name 互通：
+#   - app 連 mysql：host = "db", port = 3306
+#   - app 連 mailpit：host = "mailpit", port = 1025
+#
+# 為何用 Mailpit 不用 MailHog：
+#   MailHog 沒 ARM64 image，在 Apple Silicon Mac 上要走 amd64 模擬，又慢又會跳警告。
+#   Mailpit 是 MailHog 的後繼者，原生支援 ARM64，UI 更乾淨，SMTP / Web 介面 port 完全相容。
+# ============================================================
+
+services:
+  # ----------------------------------------------------------
+  # app：Laravel PHP 8.1 + Composer + Node
+  # ----------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: freetalk-app
+    ports:
+      - "8000:8000"
+    volumes:
+      # source code mount 進去，本機改檔案 → container 立即生效（dev 友善）
+      - ./:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy   # 等 MySQL 真的能連才啟動 app
+      mailpit:
+        condition: service_started
+    environment:
+      # 用環境變數覆蓋 .env 的對應設定
+      # Laravel 的 env() 優先讀真實環境變數，再讀 .env 檔
+      # 這樣本機跑（.env 用 127.0.0.1）跟 Docker 跑（用 service 名）都不衝突
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: freetalk
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: no-reply@freetalk.test
+      MAIL_FROM_NAME: FREE TALK
+
+  # ----------------------------------------------------------
+  # db：MySQL 8
+  # ----------------------------------------------------------
+  db:
+    image: mysql:8
+    container_name: freetalk-db
+    ports:
+      - "3306:3306"   # 暴露到 host，方便用 MySQL Workbench 之類連
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: freetalk
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      # 用 named volume 持久化資料 — container 重建 / 升級不會掉資料
+      - freetalk-db-data:/var/lib/mysql
+    # 健康檢查：app 的 depends_on 等這個通過才會啟動
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ----------------------------------------------------------
+  # mailpit：開發用 SMTP server + Web UI（MailHog 的 ARM-native 後繼）
+  # ----------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit
+    container_name: freetalk-mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+# ----------------------------------------------------------
+# named volume：MySQL 資料 — 不會跟 source code 混在一起
+# ----------------------------------------------------------
+volumes:
+  freetalk-db-data:

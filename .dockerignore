@@ -1,0 +1,19 @@
+# 不要把這些東西複製進 Docker image / build context
+# （source code 是 volume mount 進 container，所以這些都會在執行時動態安裝）
+.git
+.gitignore
+.idea
+.vscode
+.env
+.env.local
+.env.*.local
+node_modules
+vendor
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+public/storage
+.phpunit.result.cache
+Thumbs.db
+.DS_Store

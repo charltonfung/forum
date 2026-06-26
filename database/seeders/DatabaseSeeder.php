@@ -7,12 +7,19 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * 一次跑完所有 seeder
+     * 順序很重要：user → article → comment → like（後者依賴前者）
      *
-     * @return void
+     * 執行：php artisan db:seed
+     * 全重來：php artisan migrate:fresh --seed
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            UserSeeder::class,
+            ArticleSeeder::class,
+            CommentSeeder::class,
+            LikeSeeder::class,
+        ]);
     }
 }

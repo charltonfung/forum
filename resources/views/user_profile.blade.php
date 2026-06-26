@@ -95,12 +95,8 @@
             </div>
         @endforelse
 
-        {{-- 分頁 --}}
-        @if($articles->hasPages())
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                {{ $articles->links() }}
-            </div>
-        @endif
+        {{-- 分頁（永遠顯示，含「共 N 筆」+ 上下頁按鈕） --}}
+        @include('partials._pagination', ['paginator' => $articles])
     </div>
 
 </div>

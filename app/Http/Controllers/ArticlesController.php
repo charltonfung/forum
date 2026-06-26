@@ -17,7 +17,7 @@ class ArticlesController extends Controller
         $articles = Article::with('user')
             ->withCount(['likes', 'comments'])
             ->orderBy('id', 'desc')
-            ->paginate(20);
+            ->paginate(10);
         return view('articles.index', ['articles' => $articles]);
     }
 

@@ -22,7 +22,7 @@ class UserProfileController extends Controller
             ->articles()
             ->withCount(['likes', 'comments'])
             ->orderBy('id', 'desc')
-            ->paginate(20);
+            ->paginate(10);
 
         return view('user_profile', ['articles' => $articles]);
     }

@@ -1,24 +1,24 @@
 <x-jet-action-section>
     <x-slot name="title">
-        {{ __('Two Factor Authentication') }}
+        {{ __('兩階段驗證') }}
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Add additional security to your account using two factor authentication.') }}
+        {{ __('啟用兩階段驗證，為您的帳號增加額外的安全保護。') }}
     </x-slot>
 
     <x-slot name="content">
         <h3 class="text-lg font-medium text-gray-900">
             @if ($this->enabled)
-                {{ __('You have enabled two factor authentication.') }}
+                {{ __('您已啟用兩階段驗證。') }}
             @else
-                {{ __('You have not enabled two factor authentication.') }}
+                {{ __('您尚未啟用兩階段驗證。') }}
             @endif
         </h3>
 
         <div class="mt-3 max-w-xl text-sm text-gray-600">
             <p>
-                {{ __('When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone\'s Google Authenticator application.') }}
+                {{ __('啟用後，每次登入時將需要額外輸入一組由驗證器應用程式（例如手機上的 Google Authenticator）產生的安全驗證碼。') }}
             </p>
         </div>
 
@@ -26,7 +26,7 @@
             @if ($showingQrCode)
                 <div class="mt-4 max-w-xl text-sm text-gray-600">
                     <p class="font-semibold">
-                        {{ __('Two factor authentication is now enabled. Scan the following QR code using your phone\'s authenticator application.') }}
+                        {{ __('兩階段驗證已啟用。請用手機驗證器應用程式掃描以下 QR Code。') }}
                     </p>
                 </div>
 
@@ -38,7 +38,7 @@
             @if ($showingRecoveryCodes)
                 <div class="mt-4 max-w-xl text-sm text-gray-600">
                     <p class="font-semibold">
-                        {{ __('Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.') }}
+                        {{ __('請將這些復原碼保存在安全的密碼管理工具中。若您遺失了驗證裝置，可以用這些碼來復原帳號。') }}
                     </p>
                 </div>
 
@@ -54,27 +54,27 @@
             @if (! $this->enabled)
                 <x-jet-confirms-password wire:then="enableTwoFactorAuthentication">
                     <x-jet-button type="button" wire:loading.attr="disabled">
-                        {{ __('Enable') }}
+                        {{ __('啟用') }}
                     </x-jet-button>
                 </x-jet-confirms-password>
             @else
                 @if ($showingRecoveryCodes)
                     <x-jet-confirms-password wire:then="regenerateRecoveryCodes">
                         <x-jet-secondary-button class="mr-3">
-                            {{ __('Regenerate Recovery Codes') }}
+                            {{ __('重新產生復原碼') }}
                         </x-jet-secondary-button>
                     </x-jet-confirms-password>
                 @else
                     <x-jet-confirms-password wire:then="showRecoveryCodes">
                         <x-jet-secondary-button class="mr-3">
-                            {{ __('Show Recovery Codes') }}
+                            {{ __('顯示復原碼') }}
                         </x-jet-secondary-button>
                     </x-jet-confirms-password>
                 @endif
 
                 <x-jet-confirms-password wire:then="disableTwoFactorAuthentication">
                     <x-jet-danger-button wire:loading.attr="disabled">
-                        {{ __('Disable') }}
+                        {{ __('停用') }}
                     </x-jet-danger-button>
                 </x-jet-confirms-password>
             @endif

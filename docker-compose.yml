@@ -46,6 +46,7 @@ services:
       # 用環境變數覆蓋 .env 的對應設定
       # Laravel 的 env() 優先讀真實環境變數，再讀 .env 檔
       # 這樣本機跑（.env 用 127.0.0.1）跟 Docker 跑（用 service 名）都不衝突
+      APP_URL: http://localhost:8000
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: freetalk

@@ -54,6 +54,10 @@ chmod +x setup.sh
 
 預設帶 10 篇文章 + 留言 + 點讚資料。
 
+> 不需要手動編 `.env` — script 會自動 `cp .env.example .env`。
+> 而且 Docker 模式下，DB / Mail / APP_URL 這些設定都由 `docker-compose.yml` 的 `environment:` 覆蓋，
+> Laravel 直接讀環境變數，根本不會用 .env 對應的值。
+
 ---
 
 ## Docker 啟動（手動逐步）

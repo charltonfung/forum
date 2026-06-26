@@ -52,5 +52,10 @@ WORKDIR /var/www/html
 # 因為 source code 是 volume mount，container 第一次起來時 vendor/ 跟 .env 可能還沒準備好
 # （setup.sh 要在 container 跑起來「之後」才能 exec composer install / cp .env.example .env）
 # 所以這裡先 busy-wait 等這兩個檔存在，setup 完成後才真的啟動 dev server。
+#
+# 為何檢查 vendor/autoload.php 而不是 vendor 資料夾本身？
+#   composer install 中斷時，vendor/ 已經被建出來但內容不完整。autoload.php 是
+#   composer 在最後一步才生成的，能可靠表示「完整裝完了」。
+#
 # `exec` 是讓 php 取代 shell process，這樣 Ctrl+C / docker stop 訊號能正確傳給 php。
-CMD ["sh", "-c", "until [ -d vendor ] && [ -f .env ]; do echo 'Waiting for vendor/ and .env (setup in progress)...'; sleep 2; done; exec php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "until [ -f vendor/autoload.php ] && [ -f .env ]; do echo 'Waiting for vendor/autoload.php and .env (setup in progress)...'; sleep 2; done; exec php artisan serve --host=0.0.0.0 --port=8000"]
